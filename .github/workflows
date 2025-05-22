@@ -1,0 +1,37 @@
+name: Build and Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main  # Trigger the workflow on push to the main branch
+jobs:
+  deploy-to-github-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 9.x                  
+
+      - name: Publish .NET Core Project
+        run: dotnet publish src/SimpleUIDemo.BlazorWasm/SimpleUIDemo.BlazorWasm.csproj -c Release -o release --nologo
+
+      - name: Copy index.html to 404.html
+        run: cp release/wwwroot/index.html release/wwwroot/404.html
+
+      - name: Add .nojekyll file
+        run: touch release/wwwroot/.nojekyll
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: release/wwwroot  # Change this if your build folder is different
+          target_branch: gh-pages
+          base-url: '/simple-ui-demo/'  # This will adjust the base href dynamically
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub automatically provides this token
