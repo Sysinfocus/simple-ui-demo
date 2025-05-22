@@ -16,6 +16,9 @@
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="_content/Sysinfocus.AspNetCore.Components/styles.css" />
     <link rel="stylesheet" href="_content/Sysinfocus.AspNetCore.Components/Sysinfocus.AspNetCore.Components.bundle.scp.css" />
+    <script>
+        document.querySelector("base").href = (location.hostname !== "localhost" ? "/simple-ui-demo/" : "/");
+    </script>
 </head>
 
 <body>
