@@ -1,7 +1,53 @@
 ﻿@page "/"
+<style>
+    .login {        
+        max-width: 400px;
+        width: 100%;
+        margin: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.5rem;
+        border-radius: 1rem;        
+        box-shadow: 0 0 4px 4px #0001;
+        background-color:var(--primary-bg);
+        position:relative;
+        overflow:hidden;
+    }
+    .bird {
+        position: absolute;
+        right:-50px;
+        top: -40px;
+        overflow: hidden;
+        height: 150px;
+        object-fit: cover;
+        object-position: top;
+    }
+</style>
 
-<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="flex jcc aic" style="height:100dvh">
+    <div class="login">
+        <img width="200" class="bird" src="bird.png" />
+        <div class="flex-col g8 mb1">
+            <h2>Login</h2>
+            <p class="muted">Enter your valid credentials.</p>
+        </div>
+        <div class="flex-col w100">
+            <Input Label="Username" TItem="string" Focus />
+            <Input Label="Password" Type="password" TItem="string" />
+            <Checkbox Label="Remember me" />
+        </div>
 
-Welcome to your new app.
+        <div class="flex g8 mtb1">
+            <Button Text="Login" OnClick="Login" />
+            <Button Text="Cancel" Type="ButtonType.Ghost" />
+        </div>
+        <p>Don't have account? <a href="#">Register here</a></p>
+    </div>
+</div>
+
+@code
+{
+    private void Login() => browserExtensions.Goto("Dashboard");
+}

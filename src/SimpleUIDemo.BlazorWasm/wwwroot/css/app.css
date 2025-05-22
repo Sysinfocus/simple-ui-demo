@@ -1,6 +1,9 @@
 * { margin:0;padding:0;box-sizing:border-box }
-a{align-self:flex-start;outline:none}
+a{align-self:flex-start;outline:none;text-decoration:none;color:crimson}
 .container {max-width:1400px;margin:auto}
+
+.background{position:fixed;left:0;top:0;width:100vw;height:100vh;background-image:linear-gradient(135deg,#0ff4,#ff04 60%);z-index:-1}
+.dark .background{background-image:linear-gradient(135deg,#ff02,#0ff2 60%)}
 
 #blazor-error-ui {color-scheme: light only;background: lightyellow;bottom: 0;box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);box-sizing: border-box;display: none;left: 0;padding: 0.6rem 1.25rem 0.7rem 1.25rem;position: fixed;width: 100%;z-index: 1000;}
 #blazor-error-ui .dismiss {cursor: pointer;position: absolute;right: 0.75rem;top: 0.5rem;}

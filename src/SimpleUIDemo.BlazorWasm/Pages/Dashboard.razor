@@ -1,0 +1,153 @@
+﻿@page "/Dashboard"
+
+<style>
+    .sbc-sortable{border:none !important}        
+    .item-chosen{opacity:0.2}
+    .item-drag{opacity:1}
+    .db-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:1rem;margin-top:0.5rem}
+    .db-item{position:relative;display:flex;flex-direction:column;gap:0;width:100%;background-image:linear-gradient(var(--primary-bg) 90%,transparent);box-shadow:0 0 1px 0 var(--primary-fg);padding:1rem;border-radius:1rem;min-width:150px;transition:300ms ease-in-out}
+    .db-item:hover{background-color:var(--primary-fg);transition:300ms ease-in-out;cursor:grab}
+    .db-item-title{opacity:0.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
+    .db-item-percent{font-size:2rem;text-align:center;margin-top:1rem}
+    .db-item-trend{position:absolute;display:flex;gap:4px;align-self:flex-end;align-items:center;font-size:0.65rem;width:fit-content;padding:0}
+    .db-item-trend.up{color:green}
+    .db-item-trend.down{color:crimson}
+    .db-item-trend.none{color:dodgerblue;padding-block:0.15rem}
+    .no-display{display:none}
+</style>
+
+<div class="flex-col g8" style="padding:1rem">    
+
+    <div class="flex jcsb aifs">
+        <div class="flex-col g4">
+            <h3>Dashboard</h3>
+            <p class="muted">Use settings to toggle display of items.</p>
+        </div>
+        <div class="flex g4 jce">
+            <Button Icon="@(initialization.CurrentTheme == "light" ? "dark_mode" : "light_mode")" Tooltip="Toggle Theme"
+                Type="ButtonType.Ghost" Style="padding:8px" OnClick="initialization.ToggleTheme" />
+
+            <div>
+                <Button Id="settingsButton" Icon="settings" Type="ButtonType.Ghost" Style="padding:8px" OnClick="() => showMenu = !showMenu" Tooltip="Settings" />
+                <Popover ParentId="settingsButton" Show="@showMenu" OnClose="x => showMenu = x">
+                    <MenuGroup Items="@menu" OnSelect="UpdateMenu" Style="position:relative;width:fit-content" Show />
+                </Popover>
+            </div>
+
+            <Button Icon="logout" Type="ButtonType.Ghost" Style="padding:8px" Tooltip="Logout" OnClick="@(_ => browserExtensions.Goto("."))" />
+
+            <Avatar Name="Administrator" Size="AvatarSize.Small" Background="crimson" />
+        </div>
+    </div>
+    @if (dbItems?.Any(x => x.Show) is true)
+    {
+        <Sortable Class="db-items" Items="@dbItems" Id="dashboard" DragClass="item-drag"
+                  Register Sort AnimationSpeed="300" OnChange="HandleSortChange">
+            <SortableItemTemplate>
+                @if (context.Show) {
+                    <div class="item db-item">
+                        <small class="db-item-title">@context.Title</small>
+                        <h1 class="db-item-percent">@context.Price.ToString("#0.00")</h1>
+                        @if (context.Change > 0) {
+                            <div class="db-item-trend up"><Animate Type="AnimationType.Slide" FromY="7px" ToY="-3px"><Icon Name="arrow_upward" Color="inherit" Size="12px" /></Animate><b>@context.Change%</b></div>
+                        } else if(context.Change < 0) {
+                            <div class="db-item-trend down"><Animate Type="AnimationType.Slide" FromY="-3px" ToY="7px"><Icon Name="arrow_downward" Color="inherit" Size="12px" /></Animate><b>@context.Change%</b></div>
+                        } else {
+                            <div class="db-item-trend none">No Change</div>
+                        }
+                    </div>
+                } else {
+                    <div class="item no-display"></div>
+                }
+            </SortableItemTemplate>
+        </Sortable>        
+    }    
+
+    <h4 class="mt1 normal">Analytical charts</h4>
+    <Grid MinColWidth="400px">
+
+        <Card Style="background-color:#0001;border:0;box-shadow:none;border-radius:1rem">
+            <CardHeader>
+                <div class="flex-col g0 aic">
+                    <h3 class="large">Stock Analysis for last 6 days</h3>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div class="flex g0 jcc aic">
+                    <Chart Option="@barChart" Width="400px" Height="300px" />
+                </div>
+            </CardContent>
+            <CardFooter>
+                <div class="flex-col g4 aic w100" style="padding-bottom: 1.5rem">
+                    <small class="flex g8 aic">Trending up by 5.2% this month <Icon Name="trending_up" Size="18px" /></small>
+                </div>
+            </CardFooter>
+        </Card>
+
+        <Card Style="border:0;box-shadow:none;border-radius:1rem">
+            <CardHeader>
+                <div class="flex-col g0 aic">
+                    <h3 class="large">Stock Prices - Today</h3>
+                    <p class="muted">Today's stocks that have impact on the Index</p>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div class="flex jcc aic">
+                    <Table>
+                        <TableHeader>
+                            <tr>
+                                <th>Stock</th>
+                                <th class="ta-right" style="width:100px">Price <Icon Name="swap_vert" Size="16px" /></th>
+                                <th class="ta-right" style="width:60px">Chg (%)</th>
+                            </tr>
+                        </TableHeader>
+                        <TableBody>
+                            @foreach(var item in dbItems ?? [])
+                            {
+                                <tr>
+                                    <td>@item.Title</td>
+                                    <td class="ta-right">
+                                        <div class="flex g8 aic jce">
+                                            @item.Price.ToString("N2")
+                                            @if (item.Change > 0) { <Icon Name="arrow_upward" Color="seagreen" Size="14px" /> }
+                                            else if (item.Change < 0) { <Icon Name="arrow_downward" Color="crimson" Size="14px" /> }
+                                            else { <Icon Name="equal" Color="royalblue" Size="12px" /> }
+                                        </div>
+                                    </td>
+                                    <td class="ta-right">@item.Change.ToString("N2")</td>
+                                </tr>
+                            }
+                        </TableBody>
+                    </Table>
+                </div>
+            </CardContent>
+            <CardFooter>
+                <div class="flex-col g4 aic w100" style="padding-bottom: 1.5rem">
+                    <small class="flex g8 aic"><b>3</b>stocks <Icon Name="trending_up" Color="seagreen" Size="18px" /><b>2</b>stocks <Icon Name="trending_down" Color="crimson" Size="18px" /><b>1</b>stock <Icon Name="trending_flat" Color="royalblue" Size="18px" /></small>
+                    <p class="muted">Today's stock price analysis</p>
+                </div>
+            </CardFooter>
+        </Card>
+
+        <Card Style="background-color:#0001;border:0;box-shadow:none;border-radius:1rem">
+            <CardHeader>
+                <div class="flex-col g0 aic">
+                    <h3 class="large">Pie Chart - Donut with Text</h3>
+                    <p class="muted">January - June 2024</p>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div class="flex jcc aic">
+                    <Chart Option="@pieChart" Width="400px" Height="300px" />
+                </div>
+            </CardContent>
+            <CardFooter>
+                <div class="flex-col g4 aic w100" style="padding-bottom: 1.5rem">
+                    <small class="flex g8 aic">Trending up by 5.2% this month <Icon Name="trending_up" Size="18px" /></small>
+                    <p class="muted">Showing total sales for the last 6 months</p>
+                </div>
+            </CardFooter>
+        </Card>
+
+    </Grid>
+</div>
