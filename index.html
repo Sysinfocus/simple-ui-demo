@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="white">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black">
+    <title>Simple/ui Demo using Blazor Wasm</title>
+    <base href="/" />
+    <link rel="icon" href="icon-192.png" />
+    <link rel="shortcut icon" href="icon-192.png" />
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="stylesheet" href="_content/Sysinfocus.AspNetCore.Components/styles.css" />
+    <link rel="stylesheet" href="_content/Sysinfocus.AspNetCore.Components/Sysinfocus.AspNetCore.Components.bundle.scp.css" />
+    <script>
+        document.querySelector("base").href = (location.hostname !== "localhost" ? "/simple-ui-demo/" : "/");
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="container">
+            <style>
+                .loading {display: flex;flex-direction: row;gap: 0.5rem;padding: 1rem 0.5rem;justify-content: center;}
+                .loading > i {width: 12px;height: 12px;border-radius: 100%;background-color: purple;animation: float 500ms ease-in-out var(--d) infinite alternate-reverse;}
+                @keyframes float {
+                    from {opacity: 0;transform: scale(0.25) translate(10px,10px)}
+                    to {opacity: 1;transform: scale(1)}
+                }
+            </style>
+            <div style="display: flex; height:100vh; place-items:center;place-content: center"><div class="loading"><i style="--d:.1s"></i><i style="--d:.3s"></i><i style="--d:.5s"></i><i style="--d:.7s"></i><i style="--d:.9s"></i></div></div>
+        </div>
+    </div>
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="." class="reload">Reload</a>
+        <span class="dismiss">🗙</span>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+</html>
