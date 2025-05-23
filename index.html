@@ -3,19 +3,26 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="A sample demonstrating the use cases of simple/ui components in the real world apps." />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="white">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
     <title>Simple/ui Demo using Blazor Wasm</title>
     <base href="" />
     <link rel="icon" href="icon-192.png" />
     <link rel="shortcut icon" href="icon-192.png" />
+    <link rel="preload" as="style" href="css/app.css" />
     <link rel="stylesheet" href="css/app.css" />
+    <link rel="preload" as="style" href="_content/Sysinfocus.AspNetCore.Components/styles.css" />
     <link rel="stylesheet" href="_content/Sysinfocus.AspNetCore.Components/styles.css" />
-    <link rel="stylesheet" href="_content/Sysinfocus.AspNetCore.Components/Sysinfocus.AspNetCore.Components.bundle.scp.css" />    
+    <link rel="preload" as="style" href="_content/Sysinfocus.AspNetCore.Components/Sysinfocus.AspNetCore.Components.bundle.scp.css" />
+    <link rel="stylesheet" href="_content/Sysinfocus.AspNetCore.Components/Sysinfocus.AspNetCore.Components.bundle.scp.css" />
 </head>
 
 <body>
@@ -37,6 +44,11 @@
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
+    <script>
+        if (location.href === "/") {
+            fetch("first.html").then(response => response.text()).then(result => document.querySelector("#app").innerHTML = result);
+        }
+    </script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 </html>
