@@ -2,6 +2,20 @@
 
 <div class="background"></div>
 <div class="container" @onclick="initialization.HandleMainLayoutClickEvent">
+    <div class="flex jcsb aifs">
+        <h4>Simple/ui</h4>
+        <SectionOutlet SectionName="pageSettings" />
+        <SectionContent SectionName="pageSettings">
+            <div class="flex g4 jce">
+                <Button AccessKey="`" Icon="@(initialization.CurrentTheme == "light" ? "dark_mode" : "light_mode")" Tooltip="Toggle Theme"
+                        Type="ButtonType.Ghost" Style="padding:8px" OnClick="initialization.ToggleTheme" />
+
+                <Button AccessKey="l" Icon="logout" Type="ButtonType.Ghost" Style="padding:8px" Tooltip="Logout" OnClick="@(_ => browserExtensions.Goto("."))" />
+
+                <Avatar Name="Administrator" Size="AvatarSize.Small" Background="crimson" />
+            </div>
+        </SectionContent>
+    </div>
     @Body
 </div>
 
@@ -9,6 +23,10 @@
 {
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) await initialization.InitializeTheme();
+        if (firstRender)
+        {
+            await initialization.InitializeTheme();
+            await initialization.PreloadJSAndCSSDependencies(PreloadType.Charts, PreloadType.Sortable);
+        }
     }
 }

@@ -1,0 +1,72 @@
+﻿@page "/Todos"
+
+<div class="flex jcsb aife mtb1">
+    <div class="flex g8 aic">
+        <Button AccessKey="b" Icon="arrow_back" Class="rounded" Style="padding:8px" OnClick="@(_ => browserExtensions.Goto("Dashboard"))" />
+        <h3>Todos</h3>
+    </div>
+    <div class="flex g8">
+        <Input AccessKey="s" Placeholder="Search ..." ChangeOnInput="false" Type="search" @bind-Value="@_search" @bind-Value:after="HandleSearch" />
+        <Button AccessKey="=" Icon="add" Type="ButtonType.Secondary" Style="padding-inline: 8px" Tooltip="Add New" />
+    </div>
+</div>
+
+<BusyAnimation Show="@(_data is null)" />
+
+<div class="flex-col">
+    @if (_pagedData is not null)
+    {
+        <div style="background-color: var(--primary-bg); overflow:hidden">
+        <DataTable Items="@_pagedData" TItem="Todo" Height="calc(100dvh - 225px)" OnDeleteKey="HandleDelete">
+            <DataColumns>
+                <DataTableColumn Freeze="0px" Property="d => d.Id" Header="Actions" Width="75px" Align="Alignment.Center">
+                    <Template>
+                        <div class="flex jcc aic">
+                            <Icon Name="delete" Tooltip="Delete" Size="18px" Color="red" OnClick="() => HandleDelete(context)" />
+                            <Icon Name="edit" Tooltip="Edit" Size="18px" Color="royalblue" OnClick="() => HandleEdit(context)" />
+                        </div>
+                    </Template>
+                </DataTableColumn>
+                <DataTableColumn Freeze="75px" Property="d => d.Id" Header="ID" Width="85px" Align="Alignment.Right" SortOn="@_sortModel" OnSort="HandleSorting" />
+                <DataTableColumn Property="d => d.UserId" Header="User ID" Width="85px" Align="Alignment.Right" SortOn="@_sortModel" OnSort="HandleSorting" />
+                <DataTableColumn Property="d=> d.UserId" Header="Image" Width="85px" Align="Alignment.Center">
+                    <Template>                        
+                        <Avatar ImageUrl="@($"https://randomuser.me/api/portraits/men/{context.UserId - 1}.jpg")" Size="AvatarSize.Small" />
+                    </Template>
+                </DataTableColumn>
+                <DataTableColumn Property="d => d.Title" Header="Title" Style="min-width: 400px" />
+                <DataTableColumn Property="d => d.Completed" Header="Status" Width="100px" SortOn="@_sortModel" OnSort="HandleSorting">
+                    <Template>
+                        @if(context.Completed) {
+                            <Icon Name="check" Color="green" />
+                        }
+                    </Template>
+                </DataTableColumn>
+            </DataColumns>
+        </DataTable>
+        </div>
+            
+        <div class="desktop">
+            <div class="flex jcsb aic">
+                <p class="muted">@_paging.PagingDetails(_search)</p>
+                <Pagination State="@_paging" OnPageChange="HandlePaging" ActiveType="ButtonType.Primary" ShowFirstLast PreviousText="" NextText="" />
+            </div>
+        </div>
+
+        <div class="mobile">
+            <div class="flex-col aic">
+                <p class="muted">@_paging.PagingDetails(_search)</p>
+                <Pagination State="@_paging" OnPageChange="HandlePaging" ActiveType="ButtonType.Primary" ShowFirstLast PreviousText="" NextText="" />
+            </div>
+        </div>
+    }
+</div>
+
+<AlertDialog Show="@_confirmDelete">
+    <Header>Are you absolutely sure?</Header>
+    <Content>This action cannot be undone. This will permanently delete the record from your database.</Content>
+    <Footer>
+        <Button Text="Cancel" Type="ButtonType.Outline" OnClick="HandleDeleteCancelled" />
+        <Button Text="Continue" OnClick="HandleDeleteConfirmation" />
+    </Footer>
+</AlertDialog>

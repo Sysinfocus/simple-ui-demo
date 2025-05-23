@@ -16,28 +16,35 @@
     .no-display{display:none}
 </style>
 
-<div class="flex-col g8" style="padding:1rem">    
+    
 
+<SectionContent SectionName="pageSettings">
+    <div class="flex g4 jce">
+        <Button Icon="@(initialization.CurrentTheme == "light" ? "dark_mode" : "light_mode")" Tooltip="Toggle Theme"
+                Type="ButtonType.Ghost" Style="padding:8px" OnClick="initialization.ToggleTheme" />
+
+        <div>
+            <Button Id="settingsButton" Icon="settings" Type="ButtonType.Ghost" Style="padding:8px" OnClick="() => showMenu = !showMenu" Tooltip="Settings" />
+            <Popover ParentId="settingsButton" Show="@showMenu" OnClose="x => showMenu = x">
+                <MenuGroup Items="@menu" OnSelect="UpdateMenu" Style="position:relative;width:fit-content" Show />
+            </Popover>
+        </div>
+
+        <Button Icon="logout" Type="ButtonType.Ghost" Style="padding:8px" Tooltip="Logout" OnClick="@(_ => browserExtensions.Goto("."))" />
+
+        <Avatar Name="Administrator" Size="AvatarSize.Small" Background="crimson" />
+    </div>
+</SectionContent>
+
+<div class="flex-col g8 mt1">
     <div class="flex jcsb aifs">
         <div class="flex-col g4">
             <h3>Dashboard</h3>
             <p class="muted">Use settings to toggle display of items.</p>
         </div>
-        <div class="flex g4 jce">
-            <Button Icon="@(initialization.CurrentTheme == "light" ? "dark_mode" : "light_mode")" Tooltip="Toggle Theme"
-                Type="ButtonType.Ghost" Style="padding:8px" OnClick="initialization.ToggleTheme" />
 
-            <div>
-                <Button Id="settingsButton" Icon="settings" Type="ButtonType.Ghost" Style="padding:8px" OnClick="() => showMenu = !showMenu" Tooltip="Settings" />
-                <Popover ParentId="settingsButton" Show="@showMenu" OnClose="x => showMenu = x">
-                    <MenuGroup Items="@menu" OnSelect="UpdateMenu" Style="position:relative;width:fit-content" Show />
-                </Popover>
-            </div>
-
-            <Button Icon="logout" Type="ButtonType.Ghost" Style="padding:8px" Tooltip="Logout" OnClick="@(_ => browserExtensions.Goto("."))" />
-
-            <Avatar Name="Administrator" Size="AvatarSize.Small" Background="crimson" />
-        </div>
+        <Button AccessKey="=" Icon="add" Text="Todos" Type="ButtonType.Ghost" Style="padding-inline:4px 8px"
+                OnClick="@(_ => browserExtensions.Goto("Todos"))" />
     </div>
     @if (dbItems?.Any(x => x.Show) is true)
     {
@@ -64,7 +71,7 @@
     }    
 
     <h4 class="mt1 normal">Analytical charts</h4>
-    <Grid MinColWidth="400px">
+    <Grid MinColWidth="300px">
 
         <Card Style="background-color:#0001;border:0;box-shadow:none;border-radius:1rem">
             <CardHeader>
@@ -74,7 +81,7 @@
             </CardHeader>
             <CardContent>
                 <div class="flex g0 jcc aic">
-                    <Chart Option="@barChart" Width="400px" Height="300px" />
+                    <Chart Option="@barChart" Width="300px" Height="300px" />
                 </div>
             </CardContent>
             <CardFooter>
@@ -92,13 +99,13 @@
                 </div>
             </CardHeader>
             <CardContent>
-                <div class="flex jcc aic">
+                <div class="flex jcc aic" style="margin-inline: -1.5rem">
                     <Table>
                         <TableHeader>
                             <tr>
                                 <th>Stock</th>
                                 <th class="ta-right" style="width:100px">Price <Icon Name="swap_vert" Size="16px" /></th>
-                                <th class="ta-right" style="width:60px">Chg (%)</th>
+                                <th class="ta-right" style="width:40px">Chg (%)</th>
                             </tr>
                         </TableHeader>
                         <TableBody>
@@ -138,7 +145,7 @@
             </CardHeader>
             <CardContent>
                 <div class="flex jcc aic">
-                    <Chart Option="@pieChart" Width="400px" Height="300px" />
+                    <Chart Option="@pieChart" Width="300px" Height="300px" />
                 </div>
             </CardContent>
             <CardFooter>
@@ -150,4 +157,5 @@
         </Card>
 
     </Grid>
+
 </div>

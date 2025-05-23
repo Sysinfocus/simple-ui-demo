@@ -1,3 +1,4 @@
+using SimpleUIDemo.BlazorWasm.Models;
 using Sysinfocus.AspNetCore.Components;
 using System.Text.Json;
 
@@ -8,7 +9,6 @@ public partial class Dashboard
     private bool showMenu;
     private string? barChart, pieChart;
     private List<DashboardItem> dbItems = [];
-
     protected override void OnInitialized()
     {
         SetupBarChart();
@@ -119,6 +119,4 @@ public partial class Dashboard
         dbItems.Remove(itm);
         dbItems.Insert(index.nIndex, itm);
     }
-
-    private record DashboardItem(string Title, double Price, double Change) { public bool Show { get; set; } = true; };
 }
