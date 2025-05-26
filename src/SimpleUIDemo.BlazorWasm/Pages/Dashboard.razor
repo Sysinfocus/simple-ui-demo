@@ -24,9 +24,9 @@
                 Type="ButtonType.Ghost" Style="padding:8px" OnClick="initialization.ToggleTheme" />
 
         <div>
-            <Button Id="settingsButton" Icon="settings" Type="ButtonType.Ghost" Style="padding:8px" OnClick="() => showMenu = !showMenu" Tooltip="Settings" />
-            <Popover ParentId="settingsButton" Show="@showMenu" OnClose="x => showMenu = x">
-                <MenuGroup Items="@menu" OnSelect="UpdateMenu" Style="position:relative;width:fit-content" Show />
+            <Button Id="settingsButton" Icon="settings" Type="ButtonType.Ghost" Style="padding:8px" OnClick="() => _showMenu = !_showMenu" Tooltip="Settings" />
+            <Popover ParentId="settingsButton" Show="@_showMenu" OnClose="x => _showMenu = x">
+                <MenuGroup Items="@_menu" OnSelect="UpdateMenu" Style="position:relative;width:fit-content" Show />
             </Popover>
         </div>
 
@@ -46,9 +46,9 @@
         <Button AccessKey="=" Icon="add" Text="Todos" Type="ButtonType.Ghost" Style="padding-inline:4px 8px"
                 OnClick="@(_ => browserExtensions.Goto("Todos"))" />
     </div>
-    @if (dbItems?.Any(x => x.Show) is true)
+    @if (_dbItems?.Any(x => x.Show) is true)
     {
-        <Sortable Class="db-items" Items="@dbItems" Id="dashboard" DragClass="item-drag"
+        <Sortable Class="db-items" Items="@_dbItems" Id="dashboard" DragClass="item-drag"
                   Register Sort AnimationSpeed="300" OnChange="HandleSortChange">
             <SortableItemTemplate>
                 @if (context.Show) {
@@ -81,7 +81,7 @@
             </CardHeader>
             <CardContent>
                 <div class="flex g0 jcc aic">
-                    <Chart Option="@barChart" Width="300px" Height="300px" />
+                    <Chart Option="@_barChart" Width="300px" Height="300px" />
                 </div>
             </CardContent>
             <CardFooter>
@@ -109,7 +109,7 @@
                             </tr>
                         </TableHeader>
                         <TableBody>
-                            @foreach(var item in dbItems ?? [])
+                            @foreach(var item in _dbItems ?? [])
                             {
                                 <tr>
                                     <td>@item.Title</td>
@@ -145,7 +145,7 @@
             </CardHeader>
             <CardContent>
                 <div class="flex jcc aic">
-                    <Chart Option="@pieChart" Width="300px" Height="300px" />
+                    <Chart Option="@_pieChart" Width="300px" Height="300px" />
                 </div>
             </CardContent>
             <CardFooter>

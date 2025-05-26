@@ -7,7 +7,7 @@
     </div>
     <div class="flex g8">
         <Input AccessKey="s" Placeholder="Search ..." ChangeOnInput="false" Type="search" @bind-Value="@_search" @bind-Value:after="HandleSearch" />
-        <Button AccessKey="=" Icon="add" Type="ButtonType.Secondary" Style="padding-inline: 8px" Tooltip="Add New" />
+        <Button AccessKey="=" Icon="add" Type="ButtonType.Secondary" Style="padding-inline: 8px" Tooltip="Add New" OnClick="@(_ => _isAdding = true)" />
     </div>
 </div>
 
@@ -17,7 +17,7 @@
     @if (_pagedData is not null)
     {
         <div style="background-color: var(--primary-bg); overflow:hidden">
-        <DataTable Items="@_pagedData" TItem="Todo" Height="calc(100dvh - 225px)" OnDeleteKey="HandleDelete">
+        <DataTable Items="@_pagedData" TItem="Todo" Height="calc(100dvh - 225px)" OnEnterKey="HandleEdit" OnDeleteKey="HandleDelete">
             <DataColumns>
                 <DataTableColumn Freeze="0px" Property="d => d.Id" Header="Actions" Width="75px" Align="Alignment.Center">
                     <Template>
@@ -31,7 +31,7 @@
                 <DataTableColumn Property="d => d.UserId" Header="User ID" Width="85px" Align="Alignment.Right" SortOn="@_sortModel" OnSort="HandleSorting" />
                 <DataTableColumn Property="d=> d.UserId" Header="Image" Width="85px" Align="Alignment.Center">
                     <Template>                        
-                        <Avatar ImageUrl="@($"https://randomuser.me/api/portraits/men/{context.UserId - 1}.jpg")" Size="AvatarSize.Small" />
+                        <Avatar Background="transparent" ImageUrl="@($"https://randomuser.me/api/portraits/men/{context.UserId - 1}.jpg")" Size="AvatarSize.Small" />
                     </Template>
                 </DataTableColumn>
                 <DataTableColumn Property="d => d.Title" Header="Title" Style="min-width: 400px" />
@@ -61,6 +61,26 @@
         </div>
     }
 </div>
+
+@if (_isAdding)
+{
+    <AddTodo OnAdd="HandleAddNew" OnClose="HandleCloseAddition" />
+}
+else if (_isEditing)
+{
+    <EditTodo Model="@_actionItem" OnUpdate="HandleUpdate" OnClose="HandleCloseAddition" />
+}
+
+@if (_showAlert)
+{
+    <div class="flex jcc aic" style="position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%)">
+        <Alert Title="@_alertMessage" Description="" Type="@_alertType" />
+    </div>
+    Task.Delay(2000).ContinueWith(async x => {
+        _showAlert = false;
+        await InvokeAsync(StateHasChanged);
+    });
+}
 
 <AlertDialog Show="@_confirmDelete">
     <Header>Are you absolutely sure?</Header>

@@ -1,0 +1,33 @@
+﻿<Sheet Show OnClose="HandleClose">
+    <div class="h100 flex-col jcsb">
+        <div class="flex-col mb1">
+            <h3>Edit Todo</h3>
+            <CascadingValue Value="@Model.Errors()" IsFixed>
+
+                <Input Id="title" Focus Label="Title" @bind-Value="@Model.Title" Error="@(nameof(Model.Title))" />
+                <Checkbox Label="Is Completed?" Checked="@Model.Completed" OnClick="x => Model.Completed = x" />
+
+            </CascadingValue>
+        </div>
+        <div class="flex g8 jce">
+            <Button Text="Update" OnClick="HandleUpdate" />
+            <Button Text="Discard" Type="ButtonType.Ghost" OnClick="HandleClose" />
+        </div>
+    </div>
+</Sheet>
+
+@code
+{
+    [Parameter] public EventCallback<Todo> OnUpdate { get; set; }
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+    [Parameter, EditorRequired] public Todo Model { get; set; }
+    private Dictionary<string, string> _errors = [];
+
+    private async Task HandleUpdate()
+    {
+        await OnUpdate.InvokeAsync(Model);
+        await OnClose.InvokeAsync(true);
+    }
+
+    private async Task HandleClose() => await OnClose.InvokeAsync(false);
+}

@@ -1,6 +1,7 @@
 ﻿using SimpleUIDemo.BlazorWasm.Models;
 using Sysinfocus.AspNetCore.Components;
 using System.Net.Http.Json;
+using System.Net.NetworkInformation;
 using System.Text.Json;
 
 namespace SimpleUIDemo.BlazorWasm;
@@ -13,11 +14,16 @@ public static class Extensions
         var _data = await client.GetFromJsonAsync<ICollection<T>>(url, _serializerOptions);
         if (_data is not null)
         {
-            paging.TotalRecords = _data.Count;
-            var _pagedData = _data.Take(paging.PageSize);
+            var _pagedData = _data.UpdatePaging(paging);
             return (_data, _pagedData);
         }
         return (_data, null);
+    }
+
+    public static IEnumerable<T> UpdatePaging<T>(this ICollection<T> _data, PaginationState paging)
+    {
+        paging.TotalRecords = _data.Count;
+        return _data.Take(paging.PageSize);
     }
 
     public static T If<T>(this T oldValue, bool condition, T newValue)

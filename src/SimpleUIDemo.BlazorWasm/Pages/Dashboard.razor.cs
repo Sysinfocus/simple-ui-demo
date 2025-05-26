@@ -5,10 +5,10 @@ using System.Text.Json;
 namespace SimpleUIDemo.BlazorWasm.Pages;
 public partial class Dashboard
 {
-    private List<MenuItemOption> menu = [];
-    private bool showMenu;
-    private string? barChart, pieChart;
-    private List<DashboardItem> dbItems = [];
+    private readonly List<MenuItemOption> _menu = [];
+    private bool _showMenu;
+    private string? _barChart, _pieChart;
+    private List<DashboardItem> _dbItems = [];
     protected override void OnInitialized()
     {
         SetupBarChart();
@@ -20,7 +20,7 @@ public partial class Dashboard
 
     private void SetupDashboardItems()
     {
-        dbItems = [
+        _dbItems = [
             new("HDFC Bank", 1930.7, 16.87),
             new("Bharat Elec", 373.5, 12.36),
             new("Bajaj Finance", 9190, 12.02),
@@ -32,11 +32,11 @@ public partial class Dashboard
 
     private void SetupMenuItems()
     {
-        foreach (var item in dbItems)
-            menu.Add(new(item.Title) { MenuType = MenuType.Checkbox, Checked = item.Show });
+        foreach (var item in _dbItems)
+            _menu.Add(new(item.Title) { MenuType = MenuType.Checkbox, Checked = item.Show });
 
-        menu.Add(new(string.Empty));
-        menu.Add(new("Reset All") { MenuType = MenuType.Icon, Icon = "refresh" });
+        _menu.Add(new(string.Empty));
+        _menu.Add(new("Reset All") { MenuType = MenuType.Icon, Icon = "refresh" });
     }
 
     private void SetupBarChart()
@@ -59,7 +59,7 @@ public partial class Dashboard
                 backgroundStyle = new { color = "rgba(220, 220, 220, 0.8)" }
             }
         };
-        barChart = JsonSerializer.Serialize(barChartData);
+        _barChart = JsonSerializer.Serialize(barChartData);
     }
 
     private void SetupPieChart()
@@ -89,14 +89,14 @@ public partial class Dashboard
                 }
             }
         };
-        pieChart = JsonSerializer.Serialize(pieChartData);
+        _pieChart = JsonSerializer.Serialize(pieChartData);
     }
 
     private void ResetMenu()
     {
-        dbItems.ForEach(x => x.Show = true);
-        menu.ForEach(x => x.Checked = true);
-        showMenu = false;
+        _dbItems.ForEach(x => x.Show = true);
+        _menu.ForEach(x => x.Checked = true);
+        _showMenu = false;
     }
 
     private void UpdateMenu(MenuItemOption mio)
@@ -107,16 +107,16 @@ public partial class Dashboard
             return;
         }
 
-        var update = dbItems.FirstOrDefault(x => x.Title == mio.Text);
+        var update = _dbItems.FirstOrDefault(x => x.Title == mio.Text);
         if (update is null) return;
         update.Show = mio.Checked;
     }
 
     private void HandleSortChange((int oIndex, int nIndex, string from, string to) index)
     {
-        if (dbItems is null || index.from != "dashboard") return;
-        var itm = dbItems[index.oIndex];
-        dbItems.Remove(itm);
-        dbItems.Insert(index.nIndex, itm);
+        if (_dbItems is null || index.from != "dashboard") return;
+        var itm = _dbItems[index.oIndex];
+        _dbItems.Remove(itm);
+        _dbItems.Insert(index.nIndex, itm);
     }
 }

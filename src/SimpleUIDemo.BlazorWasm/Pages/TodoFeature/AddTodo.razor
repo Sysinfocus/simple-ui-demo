@@ -1,0 +1,35 @@
+﻿<Sheet Show OnClose="HandleClose">
+    <div class="h100 flex-col jcsb">
+        <div class="flex-col mb1">
+            <h3>Add Todo</h3>
+            <CascadingValue Value="@_model.Errors()" IsFixed>
+
+                <Input Id="title" Focus Label="Title" @bind-Value="@_model.Title" Error="@(nameof(_model.Title))" />
+
+            </CascadingValue>
+        </div>
+        <div class="flex g8 jce">
+            <Button Text="Add" OnClick="HandleAdd" />
+            <Button Text="Cancel" Type="ButtonType.Ghost" OnClick="HandleClose" />
+        </div>
+    </div>
+</Sheet>
+
+@code
+{
+    [Parameter] public EventCallback<Todo> OnAdd { get; set; }
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+    private Todo _model = new();
+    private Dictionary<string, string> _errors = [];
+    private bool itemAdded = false;
+
+    private async Task HandleAdd()
+    {
+        itemAdded = true;
+        await OnAdd.InvokeAsync(_model);
+        _model = new();
+        await browserExtensions.SetFocus("#title");
+    }
+
+    private async Task HandleClose() => await OnClose.InvokeAsync(itemAdded);
+}

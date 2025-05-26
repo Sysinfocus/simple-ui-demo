@@ -1,7 +1,9 @@
 using SimpleUIDemo.BlazorWasm.Models;
 using Sysinfocus.AspNetCore.Components;
+using System.Net.NetworkInformation;
+using System.Reflection.Metadata;
 
-namespace SimpleUIDemo.BlazorWasm.Pages;
+namespace SimpleUIDemo.BlazorWasm.Pages.TodoFeature;
 
 public partial class Todos(HttpClient client)
 {
@@ -10,10 +12,14 @@ public partial class Todos(HttpClient client)
     private string _search = string.Empty;
     private SortModel _sortModel = new() { Header = "ID", IsAscending = true };
     private PaginationState _paging = new() { CurrentPage = 1, TotalRecords = 0 };
-    private bool _confirmDelete;
+    private bool _isAdding, _isEditing, _confirmDelete;
     private Todo? _actionItem;
 
-    protected override async Task OnParametersSetAsync() =>
+    private bool _showAlert;
+    private string? _alertMessage;
+    private AlertType _alertType = AlertType.Success;
+
+    protected override async Task OnInitializedAsync() =>
         (_data, _pagedData) = await client.LoadData<Todo>("https://jsonplaceholder.typicode.com/todos", _paging);
 
     private void HandleDelete(Todo dataItem)
@@ -35,9 +41,16 @@ public partial class Todos(HttpClient client)
         _data?.Remove(_actionItem);
         _data.ResetPaging(_paging);
         HandlePaging();
+        _alertMessage = "Item deleted successfully.";
+        _alertType = AlertType.Success;
+        _showAlert = true;
     }
 
-    private async Task HandleEdit(Todo dataItem) => await Task.Delay(10);
+    private void HandleEdit(Todo dataItem)
+    {
+        _actionItem = new Todo { Id = dataItem.Id, UserId = dataItem.UserId, Title = dataItem.Title, Completed = dataItem.Completed };
+        _isEditing = true;
+    }
 
     private void HandleSorting(SortModel sortModel)
     {
@@ -67,5 +80,33 @@ public partial class Todos(HttpClient client)
             a.Id.ToString().Contains(_search, StringComparison.OrdinalIgnoreCase)
         );
         _pagedData.ResetPaging(_paging);
+    }
+
+    private void HandleAddNew(Todo todo)
+    {
+        todo.UserId = 1;
+        todo.Id = (_data?.Max(x => x.Id) ?? 0) + 1;
+        _data?.Add(todo);
+    }
+
+    private void HandleUpdate(Todo todo)
+    {
+        if (_actionItem?.Id != todo.Id) return;
+        var updateItem = _data?.FirstOrDefault(x => x.Id ==  todo.Id);
+        if (updateItem is null) return;
+        updateItem.Title = todo.Title;
+        updateItem.Completed = todo.Completed;
+    }
+
+    private void HandleCloseAddition(bool refreshPage)
+    {
+        if (_isAdding) _alertMessage = "Item added successfully.";
+        else if (_isEditing) _alertMessage = "Item updated successfully.";
+        _alertType = AlertType.Success;
+        _isAdding = _isEditing = false;
+        if (!refreshPage) return;
+        _pagedData = _data?.UpdatePaging(_paging);
+        _data.ResetPaging(_paging);
+        _showAlert = true;
     }
 }
