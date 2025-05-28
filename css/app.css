@@ -4,8 +4,9 @@
 a{align-self:flex-start;outline:none;text-decoration:none;color:crimson}
 .container {max-width:1400px;margin:auto;padding:1rem}
 
-.sbc-alert {padding: 0.5rem !important}
+.sbc-alert {padding: 0.5rem !important;background-color:var(--primary-bg)}
 .sbc-alert-header{font-weight:normal !important}
+label{--error:var(--primary-fg)}
 
 .background{position:fixed;left:0;top:0;width:100vw;height:100vh;background-image:linear-gradient(135deg,#0ff4,#ff04 60%);z-index:-1}
 .dark .background{background-image:linear-gradient(135deg,#ff02,#0ff2 60%)}
