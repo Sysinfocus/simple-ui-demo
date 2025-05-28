@@ -73,7 +73,7 @@ else if (_isEditing)
 
 @if (_showAlert)
 {
-    <div class="flex jcc aic" style="position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%)">
+    <div class="flex jcc aic w100" style="position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); z-index:1">
         <Alert Title="@_alertMessage" Description="" Type="@_alertType" />
     </div>
     Task.Delay(2000).ContinueWith(async x => {

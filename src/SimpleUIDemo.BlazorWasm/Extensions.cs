@@ -1,7 +1,5 @@
-﻿using SimpleUIDemo.BlazorWasm.Models;
-using Sysinfocus.AspNetCore.Components;
+﻿using Sysinfocus.AspNetCore.Components;
 using System.Net.Http.Json;
-using System.Net.NetworkInformation;
 using System.Text.Json;
 
 namespace SimpleUIDemo.BlazorWasm;
@@ -9,15 +7,18 @@ namespace SimpleUIDemo.BlazorWasm;
 public static class Extensions
 {
     private static readonly JsonSerializerOptions _serializerOptions = new() { PropertyNameCaseInsensitive = true };
-    public static async Task<(ICollection<T>?, IEnumerable<T>?)> LoadData<T>(this HttpClient client, string url, PaginationState paging)
+    public static async Task<(ICollection<T>?, IEnumerable<T>?)> LoadData<T>(this HttpClient client, string url, PaginationState paging, string? existingData = null)
     {
-        var _data = await client.GetFromJsonAsync<ICollection<T>>(url, _serializerOptions);
-        if (_data is not null)
+        ICollection<T>? data = existingData is not null
+            ? JsonSerializer.Deserialize<ICollection<T>>(existingData, _serializerOptions)
+            : await client.GetFromJsonAsync<ICollection<T>>(url, _serializerOptions);
+
+        if (data is not null)
         {
-            var _pagedData = _data.UpdatePaging(paging);
-            return (_data, _pagedData);
+            var pagedData = data.UpdatePaging(paging);
+            return (data, pagedData);
         }
-        return (_data, null);
+        return (data, null);
     }
 
     public static IEnumerable<T> UpdatePaging<T>(this ICollection<T> _data, PaginationState paging)

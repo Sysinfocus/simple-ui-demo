@@ -1,7 +1,6 @@
 using SimpleUIDemo.BlazorWasm.Models;
 using Sysinfocus.AspNetCore.Components;
-using System.Net.NetworkInformation;
-using System.Reflection.Metadata;
+using System.Text.Json;
 
 namespace SimpleUIDemo.BlazorWasm.Pages.TodoFeature;
 
@@ -19,8 +18,11 @@ public partial class Todos(HttpClient client)
     private string? _alertMessage;
     private AlertType _alertType = AlertType.Success;
 
-    protected override async Task OnInitializedAsync() =>
-        (_data, _pagedData) = await client.LoadData<Todo>("https://jsonplaceholder.typicode.com/todos", _paging);
+    protected override async Task OnInitializedAsync()
+    {
+        var persistedData = await browserExtensions.GetFromLocalStorage("todos");
+        (_data, _pagedData) = await client.LoadData<Todo>("https://jsonplaceholder.typicode.com/todos", _paging, persistedData);
+    }
 
     private void HandleDelete(Todo dataItem)
     {
@@ -34,13 +36,14 @@ public partial class Todos(HttpClient client)
         _actionItem = null;
     }
 
-    private void HandleDeleteConfirmation()
+    private async Task HandleDeleteConfirmation()
     {
         _confirmDelete = false;
         if (_actionItem is null) return;
         _data?.Remove(_actionItem);
         _data.ResetPaging(_paging);
         HandlePaging();
+        await SaveChanges();
         _alertMessage = "Item deleted successfully.";
         _alertType = AlertType.Success;
         _showAlert = true;
@@ -98,15 +101,22 @@ public partial class Todos(HttpClient client)
         updateItem.Completed = todo.Completed;
     }
 
-    private void HandleCloseAddition(bool refreshPage)
+    private async Task HandleCloseAddition(bool refreshPage)
     {
         if (_isAdding) _alertMessage = "Item added successfully.";
         else if (_isEditing) _alertMessage = "Item updated successfully.";
         _alertType = AlertType.Success;
         _isAdding = _isEditing = false;
         if (!refreshPage) return;
+        await SaveChanges();
         _pagedData = _data?.UpdatePaging(_paging);
         _data.ResetPaging(_paging);
         _showAlert = true;
+    }
+
+    private async Task SaveChanges()
+    {
+        var data = JsonSerializer.Serialize(_data);
+        await browserExtensions.SetToLocalStorage("todos", data);
     }
 }
