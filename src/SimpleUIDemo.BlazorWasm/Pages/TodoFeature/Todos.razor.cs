@@ -9,8 +9,8 @@ public partial class Todos(HttpClient client)
     private ICollection<Todo>? _data;
     private IEnumerable<Todo>? _pagedData;
     private string _search = string.Empty;
-    private SortModel _sortModel = new() { Header = "ID", IsAscending = true };
-    private PaginationState _paging = new() { CurrentPage = 1, TotalRecords = 0 };
+    private readonly SortModel _sortModel = new() { Header = "ID", IsAscending = true };
+    private readonly PaginationState _paging = new() { CurrentPage = 1, TotalRecords = 0 };
     private bool _isAdding, _isEditing, _confirmDelete;
     private Todo? _actionItem;
 
@@ -60,29 +60,33 @@ public partial class Todos(HttpClient client)
         if (_data is null) return;
         _data = (sortModel.Header.ToLower(), sortModel.IsAscending) switch
         {
-            ("id", true) => _data.OrderBy(a => a.Id).ToList(),
-            ("id", false) => _data.OrderByDescending(a => a.Id).ToList(),
-            ("user id", true) => _data.OrderBy(a => a.UserId).ToList(),
-            ("user id", false) => _data.OrderByDescending(a => a.UserId).ToList(),
-            ("status", true) => _data.OrderBy(a => a.Completed).ToList(),
-            ("status", false) => _data.OrderByDescending(a => a.Completed).ToList(),
+            ("id", true) => [.. _data.OrderBy(a => a.Id)],
+            ("id", false) => [.. _data.OrderByDescending(a => a.Id)],
+            ("user id", true) => [.. _data.OrderBy(a => a.UserId)],
+            ("user id", false) => [.. _data.OrderByDescending(a => a.UserId)],
+            ("status", true) => [.. _data.OrderBy(a => a.Completed)],
+            ("status", false) => [.. _data.OrderByDescending(a => a.Completed)],
             (_, _) => _data
         };
         _paging.CurrentPage = 1;
         HandlePaging();
     }
 
-    private void HandlePaging() => _pagedData = _data.PageData(_paging);
+    private void HandlePaging()
+        => _pagedData = SearchResults().PageData(_paging);
 
+    private IEnumerable<Todo>? SearchResults()
+        => _data.Search(_search, a =>
+            a.Title.Match(_search) ||
+            a.UserId.ToString().Match(_search) ||
+            a.Completed.ToString().Match(_search) ||
+            a.Id.ToString().Match(_search));
+   
     private void HandleSearch()
     {
-        _pagedData = _data.Search(_search, a =>
-            a.Title.Contains(_search, StringComparison.OrdinalIgnoreCase) ||
-            a.UserId.ToString().Contains(_search, StringComparison.OrdinalIgnoreCase) ||
-            a.Completed.ToString().Contains(_search, StringComparison.OrdinalIgnoreCase) ||
-            a.Id.ToString().Contains(_search, StringComparison.OrdinalIgnoreCase)
-        );
+        _pagedData = SearchResults();
         _pagedData.ResetPaging(_paging);
+        HandlePaging();
     }
 
     private void HandleAddNew(Todo todo)

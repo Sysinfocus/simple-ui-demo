@@ -42,7 +42,21 @@ public static class Extensions
     {
         var count = paging.CurrentPage * paging.PageSize;
         count = count.If(count > paging.TotalRecords, paging.TotalRecords);
-        var searchText = search.If(!string.IsNullOrEmpty(search), $" for '{search}'");
+
+        var searchType = string.IsNullOrWhiteSpace(search) ? "" :
+            search[0] == '*' ? "ending with" :
+            search[0] == '=' ? "equal to" :
+            search[^1]== '*' ? "starting with" :
+            "containing";
+
+        var searchTerm = searchType switch
+        {
+            "ending with" or "equal to" => search?[1..],
+            "starting with" => search?[0..^1],
+            _ => search,
+        };
+
+        var searchText = search.If(!string.IsNullOrEmpty(search), $" for search {searchType} '{searchTerm}'");
         if (paging.TotalRecords == 0) return $"No records{searchText}.";
         return $"Showing {count} / {paging.TotalRecords} records{searchText}.";
     }
@@ -56,4 +70,14 @@ public static class Extensions
 
     public static IEnumerable<T>? Search<T>(this IEnumerable<T>? source, string? search, Func<T, bool> conditions)
         => string.IsNullOrEmpty(search) ? [.. source!] : [.. source!.Where(conditions)];
+
+    public static bool Match(this string? source, string? find)
+    {
+        if (string.IsNullOrWhiteSpace(find) || string.IsNullOrWhiteSpace(source)) return true;
+
+        return find[0] == '*' ? source.EndsWith(find[1..], StringComparison.OrdinalIgnoreCase)
+            : find[0] == '=' ? source.Equals(find[1..], StringComparison.OrdinalIgnoreCase)
+            : find[^1] == '*' ? source.StartsWith(find[0..^1], StringComparison.OrdinalIgnoreCase)
+            : source.Contains(find, StringComparison.OrdinalIgnoreCase);
+    }
 }
